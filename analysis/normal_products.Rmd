@@ -1,0 +1,124 @@
+---
+title: "Product of Independent Standard Normals"
+author: "Joonsuk Kang"
+date: "2021-01-11"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+# Notation
+
+Define $Y_k=\prod_{i=1}^k X_i$ where $X_i\sim^{i.i.d.} N(0,1)$.
+
+Maybe we could use notation such as $Y_k\sim^{i.i.d.}N^k(0,1)$?
+
+
+
+# Empirical distributions
+
+```{r}
+Y1 <- rnorm(n=100000, mean=0,sd=1)
+Y2 <- rnorm(n=100000, mean=0,sd=1)*Y1
+Y3 <- rnorm(n=100000, mean=0,sd=1)*Y2
+Y4 <- rnorm(n=100000, mean=0,sd=1)*Y3
+Y5 <- rnorm(n=100000, mean=0,sd=1)*Y4
+```
+
+## Empirical CDF
+```{r}
+plot(ecdf(Y1), main="Empirical CDF"); 
+lines(ecdf(Y2), col='red')
+lines(ecdf(Y3), col='blue')
+lines(ecdf(Y4), col='green')
+lines(ecdf(Y5), col='yellow')
+```
+
+## (Gaussian kernel) Smoothed Density
+
+```{r}
+plot(density(Y3), col='blue', main='smoothed density')
+lines(density(Y2), col='red')
+lines(density(Y1), col='black')
+```
+
+Notice the scale difference in y-axis
+
+```{r}
+plot(density(Y5), col='yellow', main='smoothed density')
+lines(density(Y4), col='green')
+lines(density(Y3), col='blue')
+```
+
+
+# Theoretical Results
+
+## Moments
+
+\[
+E[Y_k^p]=E[(X_1\times X_2 \times \cdots \times X_k)^p]=(E[X_1^p])^k=((p-1)!!)^k \quad\text{if p is even;} \quad\text{ =0 if p is odd}
+\]
+where $(p-1)!!=(p-1)(p-3)\cdots 3\times 1$ is the double factorial.
+
+Note that $E[Y_k]=0$ and $var(Y_k)=E[Y_k^2]=1$ for all $k$. With mean and variance fixed, the distribution in general becomes more concentrated around zero, while the tail becomes heavier as $k$ increases.
+
+
+
+## PDF
+
+When k=1, $Y_1$ follows the standard normal distribution:
+\[
+f_{Y_1}(y)=\frac{\exp(-y^2/2)}{\sqrt{2\pi}}
+\]
+
+When k=2:
+\[
+f_{Y_2}(y)=\frac{K_0\left( |y|\right)}{\pi}
+\]
+where $K_n(z)$ is a modified Bessel function of the second kind.
+
+When k=3:
+\[
+f_{Y_3}(y)=\frac{1}{(\sqrt{2\pi})^3}G_{0,3}^{3,0}\left(\frac{y^2}{8}; 0,0,0 \right)
+\]
+where $G^{m,n}_{p,q}\left(x;^{a_1,\cdots,a_p}_{b_1,\cdots,b_q}  \right)$ is a Meijer G-function.
+
+
+Reference for k=2 and k=3: https://mathworld.wolfram.com/NormalProductDistribution.html
+
+
+## Characteristic Function
+
+When k=1:
+\[
+\varphi_{Y_1}(t)=E[\exp(itY_1)]=\exp(-t^2/2)
+\]
+
+When k=2:
+\[
+\varphi_{Y_2}(t)=E[\exp(itY_2)]=\sqrt{\frac{1}{1+t^2}}
+\]
+which is trivial to obtain using https://en.wikipedia.org/wiki/Product_distribution#Characteristic_function_of_product_of_random_variables.
+
+
+## General form of CDF
+
+\[
+P(Y_k\leq t)=1-\frac{1}{2\pi^{k/2}}G^{0,k+1}_{k+1,1}\left( \frac{2^k}{t^2}; ^{1, 1/2, \cdots, 1/2} _0 \right)
+\]
+
+From Proposition 2 in https://arxiv.org/pdf/1711.10516.pdf
+
+
+
+
+
+## More papers
+
+- Exact Distribution for the Product of Two Correlated
+Gaussian Random Variables
+(https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7579552&casa_token=PwS246oKBVEAAAAA:GTHT402O2YFxiLJzaS_KsIfgnnzp9aWcoPf-WTlbsnoi1yTgcbS53UVp1QPD1PB4eH3ar-g7GA)
+
+
+
+
